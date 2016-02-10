@@ -14,12 +14,12 @@ pub enum Opcode {
 }
 
 pub enum Expression {
-    Register,
+    Register(Register),
     Value(u8),
 }
 
 pub enum Instruction {
-    push(Register),
-    pop(Register),
-    mov(Expression, Expression)
+    Push(Expression),
+    Pop(Expression),
+    Mov(Expression, Expression)
 }

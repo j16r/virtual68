@@ -2,26 +2,46 @@
 // vi: set ft=rust :
 
 use std::str::FromStr;
-use ast::{Register, Opcode};
+use ast::{Register, Opcode, Instruction, Expression};
 
 grammar;
 
 pub Program: Vec<Instruction> = {
-    Instruction "\n" Instruction
-    Instruction,
+    Instruction*
 };
 
 Instruction: Instruction = {
-    Opcode " "+ Expression "," " "+ Expression
+    "\n"? <op:Opcode> " "+ <arg:Expression> => match op {
+        Opcode::Push => Instruction::Push(arg),
+        Opcode::Pop => Instruction::Pop(arg),
+        _ => panic!("wrong number of arguments for opcode"),
+    },
+    "\n"? <op:Opcode> " "+ <lhs:Expression> " "+ <rhs:Expression> => match op {
+        Opcode::Mov => Instruction::Mov(lhs, rhs),
+        _ => panic!("wrong number of arguments for opcode"),
+    }
 };
 
 Expression: Expression = {
-    <v:Num> => Value(v),
-    Register
+    <v:Num> => Expression::Value(v),
+    <r:Register> => Expression::Register(r)
 };
 
-Num: i32 = <r"[0-9]+"> => i32::from_str(<>).unwrap();
+Num: u8 = <r"[0-9]+"> => u8::from_str(<>).unwrap();
 
-Opcode: Opcode = <r"[a-z]+"> => Opcode::from_str(<>).unwrap();
+Opcode: Opcode = <r"[a-z]+"> => match <> {
+    "push" => Opcode::Push,
+    "pop" => Opcode::Pop,
+    "mov" => Opcode::Mov,
+    _ => panic!("unrecognized opcode"),
+};
 
-Register: Register = <r"[a-z]+"> => Register::from_str(<>).unwrap();
+Register: Register = <r"[a-z]+"> => match <> {
+    "acca" => Register::ACCA,
+    "accb" => Register::ACCB,
+    "x" => Register::X,
+    "pc" => Register::PC,
+    "sp" => Register::SP,
+    "cc" => Register::CC,
+    _ => panic!("unrecognized opcode"),
+};
