@@ -1,0 +1,27 @@
+// -*- mode: rust -*-
+// vi: set ft=rust :
+
+use std::str::FromStr;
+use ast::{Register, Opcode};
+
+grammar;
+
+pub Program: Vec<Instruction> = {
+    Instruction "\n" Instruction
+    Instruction,
+};
+
+Instruction: Instruction = {
+    Opcode " "+ Expression "," " "+ Expression
+};
+
+Expression: Expression = {
+    <v:Num> => Value(v),
+    Register
+};
+
+Num: i32 = <r"[0-9]+"> => i32::from_str(<>).unwrap();
+
+Opcode: Opcode = <r"[a-z]+"> => Opcode::from_str(<>).unwrap();
+
+Register: Register = <r"[a-z]+"> => Register::from_str(<>).unwrap();
