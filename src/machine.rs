@@ -1,4 +1,4 @@
-use ast::Instruction;
+use ast::{Register, Operation, Instruction, Place};
 use grammar;
 
 pub struct Machine {
@@ -21,12 +21,19 @@ pub fn new(input: &str) -> Machine {
 }
 
 impl Machine {
-    pub fn run(&self) {
+    pub fn run(&mut self) {
         for ins in &self.program {
             match ins {
-                 &Instruction::Push(ref reg) => print!("push"),
-                 &Instruction::Pop(ref reg) => print!("pop"),
-                 &Instruction::Mov(ref lhs, ref rhs) => print!("mov"),
+                 &Instruction::Push(ref reg) => {
+                     println!("push({:?})", reg);
+                     match reg {
+                        &Place::Register(ref r) => self.ram[0] = self.registers[0] as u8,
+                        &Place::Value(ref v) => self.ram[0] = *v,
+                     }
+                     self.registers[1] += 1;
+                 },
+                 &Instruction::Pop(ref reg) => println!("pop"),
+                 &Instruction::Mov(ref lhs, ref rhs) => println!("mov"),
             }
         }
     }

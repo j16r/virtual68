@@ -15,6 +15,18 @@ fn main() {
     let result = file.read_to_end(&mut contents).unwrap();
     let input = String::from_utf8(contents).unwrap();
 
-    let machine = machine::new(&input);
+    let mut machine = machine::new(&input);
     machine.run();
+}
+
+#[cfg(test)]
+mod tests {
+    use grammar::parse_Program;
+
+    #[test]
+    fn parse() {
+        assert!(parse_Program("push 0").is_ok());
+        assert!(parse_Program("push sp").is_ok());
+        assert!(parse_Program("mov acca 0").is_ok());
+    }
 }

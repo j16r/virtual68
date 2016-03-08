@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub enum Register {
     ACCA,
     ACCB,
@@ -7,19 +8,22 @@ pub enum Register {
     CC
 }
 
-pub enum Opcode {
+#[derive(Debug)]
+pub enum Operation {
     Push,
     Pop,
     Mov
 }
 
-pub enum Expression {
+#[derive(Debug)]
+pub enum Place {
     Register(Register),
     Value(u8),
 }
 
+#[derive(Debug)]
 pub enum Instruction {
-    Push(Expression),
-    Pop(Expression),
-    Mov(Expression, Expression)
+    Push(Place),
+    Pop(Place),
+    Mov(Place, Place)
 }

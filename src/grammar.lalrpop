@@ -2,38 +2,45 @@
 // vi: set ft=rust :
 
 use std::str::FromStr;
-use ast::{Register, Opcode, Instruction, Expression};
+use ast::{Register, Operation, Instruction, Place};
 
 grammar;
 
 pub Program: Vec<Instruction> = {
-    Instruction*
-};
-
-Instruction: Instruction = {
-    "\n"? <op:Opcode> " "+ <arg:Expression> => match op {
-        Opcode::Push => Instruction::Push(arg),
-        Opcode::Pop => Instruction::Pop(arg),
-        _ => panic!("wrong number of arguments for opcode"),
-    },
-    "\n"? <op:Opcode> " "+ <lhs:Expression> " "+ <rhs:Expression> => match op {
-        Opcode::Mov => Instruction::Mov(lhs, rhs),
-        _ => panic!("wrong number of arguments for opcode"),
+    <v:(<Instruction> ";")*> <e:Instruction?> => match e {
+        None => v,
+        Some(e) => {
+            println!("Got {:?}, {:?}", e, v);
+            let mut v = v;
+            v.push(e);
+            v
+        }
     }
 };
 
-Expression: Expression = {
-    <v:Num> => Expression::Value(v),
-    <r:Register> => Expression::Register(r)
+Instruction: Instruction = {
+    <op:Operation> <lhs:Place> <rhs:Place> => match op {
+        Operation::Mov => Instruction::Mov(lhs, rhs),
+        _ => panic!("wrong number of arguments for opcode"),
+    },
+    <op:Operation> <arg:Place> => match op {
+        Operation::Push => Instruction::Push(arg),
+        Operation::Pop => Instruction::Pop(arg),
+        _ => panic!("wrong number of arguments for opcode"),
+    },
 };
 
-Num: u8 = <r"[0-9]+"> => u8::from_str(<>).unwrap();
+Operation: Operation = <r"[a-z]+"> =>
+match <> {
+    "push" => Operation::Push,
+    "pop" => Operation::Pop,
+    "mov" => Operation::Mov,
+    op => panic!("unrecognized opcode {:?}", op),
+};
 
-Opcode: Opcode = <r"[a-z]+"> => match <> {
-    "push" => Opcode::Push,
-    "pop" => Opcode::Pop,
-    "mov" => Opcode::Mov,
-    _ => panic!("unrecognized opcode"),
+Place: Place = {
+    <r:Register> => Place::Register(r),
+    <v:Num> => Place::Value(v)
 };
 
 Register: Register = <r"[a-z]+"> => match <> {
@@ -43,5 +50,8 @@ Register: Register = <r"[a-z]+"> => match <> {
     "pc" => Register::PC,
     "sp" => Register::SP,
     "cc" => Register::CC,
-    _ => panic!("unrecognized opcode"),
+    reg => panic!("unrecognized register {:?}", reg),
 };
+
+Num: u8 = <r"[0-9]+"> => u8::from_str(<>).unwrap();
+
