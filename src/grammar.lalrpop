@@ -46,7 +46,7 @@ Place: Place = {
 Register: Register = <r"[a-z]+"> => match <> {
     "acca" => Register::ACCA,
     "accb" => Register::ACCB,
-    "x" => Register::X,
+    "ix" => Register::IX,
     "pc" => Register::PC,
     "sp" => Register::SP,
     "cc" => Register::CC,

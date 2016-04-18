@@ -1537,7 +1537,7 @@ pub fn __action7<
     match __0 {
     "acca" => Register::ACCA,
     "accb" => Register::ACCB,
-    "x" => Register::X,
+    "ix" => Register::IX,
     "pc" => Register::PC,
     "sp" => Register::SP,
     "cc" => Register::CC,

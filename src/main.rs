@@ -1,6 +1,7 @@
 mod ast;
 mod grammar;
 mod machine;
+mod opcode;
 
 use std::fs::File;
 use std::io::Read;

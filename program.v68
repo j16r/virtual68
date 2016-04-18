@@ -1,0 +1,2 @@
+push sp;
+mov acca 0

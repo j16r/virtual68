@@ -1,8 +1,8 @@
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum Register {
     ACCA,
     ACCB,
-    X,
+    IX,
     PC,
     SP,
     CC
