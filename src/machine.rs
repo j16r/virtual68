@@ -1,6 +1,7 @@
 use std::ops::{Index, IndexMut};
 use ast::{Register, Operation, Instruction, Place};
 use opcode::*;
+use enum_primitive::FromPrimitive;
 use grammar;
 
 struct Ram {
@@ -50,23 +51,23 @@ impl Machine {
     pub fn run(&mut self) {
         let opcode = self.ram[self.ix];
 
-        match opcode {
-            32 => { // Opcode::PUL_A => {
+        match Opcode::from_i32(opcode as i32).unwrap() {
+            Opcode::PUL_A => {
                 self.acca = self.ram[self.sp];
                 self.sp += 1;
                 self.ix += 1;
             },
-            33 => { // Opcode::PUL_B => {
+            Opcode::PUL_B => {
                 self.accb = self.ram[self.sp];
                 self.sp += 1;
                 self.ix += 1;
             },
-            36 => { // Opcode::PSH_A => {
+            Opcode::PSH_A => {
                 self.ram[self.sp] = self.acca;
                 self.sp += 1;
                 self.ix += 1;
             },
-            37 => { // Opcode::PSH_B => {
+            Opcode::PSH_B => {
                 self.ram[self.sp] = self.accb;
                 self.sp += 1;
                 self.ix += 1;

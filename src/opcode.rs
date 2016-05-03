@@ -1,4 +1,7 @@
-#[derive(Debug)]
+use num::FromPrimitive;
+
+enum_from_primitive! {
+#[derive(Debug, PartialEq)]
 pub enum Opcode {
     Unassigned00,
     NOP,
@@ -56,4 +59,5 @@ pub enum Opcode {
     TXS,
     PSH_A,
     PSH_B,
+}
 }
