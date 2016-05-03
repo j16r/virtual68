@@ -1,6 +1,7 @@
 use num::FromPrimitive;
 
 enum_from_primitive! {
+#[allow(non_camel_case_types)]
 #[derive(Debug, PartialEq)]
 pub enum Opcode {
     Unassigned00,
