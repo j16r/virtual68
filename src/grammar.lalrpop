@@ -28,10 +28,15 @@ Instruction: Instruction = {
         Operation::Pop => Instruction::Pop(arg),
         _ => panic!("wrong number of arguments for opcode"),
     },
+    <op:Operation> => match op {
+        Operation::Nop => Instruction::Nop,
+        _ => panic!("wrong number of arguments for opcode"),
+    }
 };
 
 Operation: Operation = <r"[a-z]+"> =>
 match <> {
+    "nop" => Operation::Nop,
     "push" => Operation::Push,
     "pop" => Operation::Pop,
     "mov" => Operation::Mov,
@@ -54,4 +59,3 @@ Register: Register = <r"[a-z]+"> => match <> {
 };
 
 Num: u8 = <r"[0-9]+"> => u8::from_str(<>).unwrap();
-

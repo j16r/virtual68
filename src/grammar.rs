@@ -55,10 +55,14 @@ mod __parse__Program {
     //   (<Instruction> ";")+ = (*) (<Instruction> ";")+ Instruction ";" [r#"[a-z]+"#]
     //   (<Instruction> ";")+ = (*) Instruction ";" [EOF]
     //   (<Instruction> ";")+ = (*) Instruction ";" [r#"[a-z]+"#]
+    //   Instruction = (*) Operation [EOF]
+    //   Instruction = (*) Operation [";"]
     //   Instruction = (*) Operation Place [EOF]
     //   Instruction = (*) Operation Place [";"]
     //   Instruction = (*) Operation Place Place [EOF]
     //   Instruction = (*) Operation Place Place [";"]
+    //   Operation = (*) r#"[a-z]+"# [EOF]
+    //   Operation = (*) r#"[a-z]+"# [";"]
     //   Operation = (*) r#"[a-z]+"# [r#"[0-9]+"#]
     //   Operation = (*) r#"[a-z]+"# [r#"[a-z]+"#]
     //   Program = (*) [EOF]
@@ -67,7 +71,7 @@ mod __parse__Program {
     //   Program = (*) Instruction [EOF]
     //   __Program = (*) Program [EOF]
     //
-    //   EOF -> Reduce(Program =  => ActionFn(21);)
+    //   EOF -> Reduce(Program =  => ActionFn(22);)
     //   r#"[a-z]+"# -> Shift(S5)
     //
     //   (<Instruction> ";")+ -> S1
@@ -92,7 +96,7 @@ mod __parse__Program {
                 __result = try!(__state5(input, __lookbehind, __tokens, __sym0));
             }
             None => {
-                let __nt = super::__action21(input, &__lookbehind, &__lookahead);
+                let __nt = super::__action22(input, &__lookbehind, &__lookahead);
                 __result = (__lookbehind, __lookahead, __Nonterminal::Program(__nt));
             }
             _ => {
@@ -131,16 +135,20 @@ mod __parse__Program {
     // State 1
     //   (<Instruction> ";")+ = (<Instruction> ";")+ (*) Instruction ";" [EOF]
     //   (<Instruction> ";")+ = (<Instruction> ";")+ (*) Instruction ";" [r#"[a-z]+"#]
+    //   Instruction = (*) Operation [EOF]
+    //   Instruction = (*) Operation [";"]
     //   Instruction = (*) Operation Place [EOF]
     //   Instruction = (*) Operation Place [";"]
     //   Instruction = (*) Operation Place Place [EOF]
     //   Instruction = (*) Operation Place Place [";"]
+    //   Operation = (*) r#"[a-z]+"# [EOF]
+    //   Operation = (*) r#"[a-z]+"# [";"]
     //   Operation = (*) r#"[a-z]+"# [r#"[0-9]+"#]
     //   Operation = (*) r#"[a-z]+"# [r#"[a-z]+"#]
     //   Program = (<Instruction> ";")+ (*) [EOF]
     //   Program = (<Instruction> ";")+ (*) Instruction [EOF]
     //
-    //   EOF -> Reduce(Program = (<Instruction> ";")+ => ActionFn(23);)
+    //   EOF -> Reduce(Program = (<Instruction> ";")+ => ActionFn(24);)
     //   r#"[a-z]+"# -> Shift(S5)
     //
     //   Instruction -> S6
@@ -165,7 +173,7 @@ mod __parse__Program {
             }
             None => {
                 let __sym0 = __sym0.take().unwrap();
-                let __nt = super::__action23(input, __sym0, &__lookbehind, &__lookahead);
+                let __nt = super::__action24(input, __sym0, &__lookbehind, &__lookahead);
                 return Ok((__lookbehind, __lookahead, __Nonterminal::Program(__nt)));
             }
             _ => {
@@ -199,7 +207,7 @@ mod __parse__Program {
     //   (<Instruction> ";")+ = Instruction (*) ";" [r#"[a-z]+"#]
     //   Program = Instruction (*) [EOF]
     //
-    //   EOF -> Reduce(Program = Instruction => ActionFn(20);)
+    //   EOF -> Reduce(Program = Instruction => ActionFn(21);)
     //   ";" -> Shift(S7)
     //
     pub fn __state2<
@@ -222,7 +230,7 @@ mod __parse__Program {
             }
             None => {
                 let __sym0 = __sym0.take().unwrap();
-                let __nt = super::__action20(input, __sym0, &__lookbehind, &__lookahead);
+                let __nt = super::__action21(input, __sym0, &__lookbehind, &__lookahead);
                 return Ok((__lookbehind, __lookahead, __Nonterminal::Program(__nt)));
             }
             _ => {
@@ -236,6 +244,8 @@ mod __parse__Program {
     }
 
     // State 3
+    //   Instruction = Operation (*) [EOF]
+    //   Instruction = Operation (*) [";"]
     //   Instruction = Operation (*) Place [EOF]
     //   Instruction = Operation (*) Place [";"]
     //   Instruction = Operation (*) Place Place [EOF]
@@ -257,6 +267,8 @@ mod __parse__Program {
     //   Register = (*) r#"[a-z]+"# [r#"[0-9]+"#]
     //   Register = (*) r#"[a-z]+"# [r#"[a-z]+"#]
     //
+    //   EOF -> Reduce(Instruction = Operation => ActionFn(4);)
+    //   ";" -> Reduce(Instruction = Operation => ActionFn(4);)
     //   r#"[0-9]+"# -> Shift(S11)
     //   r#"[a-z]+"# -> Shift(S12)
     //
@@ -285,6 +297,12 @@ mod __parse__Program {
                 let mut __lookbehind = Some(__loc);
                 let mut __sym1 = &mut Some((__tok0));
                 __result = try!(__state12(input, __lookbehind, __tokens, __sym1));
+            }
+            None |
+            Some((_, (0, _), _)) => {
+                let __sym0 = __sym0.take().unwrap();
+                let __nt = super::__action4(input, __sym0, &__lookbehind, &__lookahead);
+                return Ok((__lookbehind, __lookahead, __Nonterminal::Instruction(__nt)));
             }
             _ => {
                 return Err(__ParseError::UnrecognizedToken {
@@ -349,11 +367,15 @@ mod __parse__Program {
     }
 
     // State 5
+    //   Operation = r#"[a-z]+"# (*) [EOF]
+    //   Operation = r#"[a-z]+"# (*) [";"]
     //   Operation = r#"[a-z]+"# (*) [r#"[0-9]+"#]
     //   Operation = r#"[a-z]+"# (*) [r#"[a-z]+"#]
     //
-    //   r#"[0-9]+"# -> Reduce(Operation = r#"[a-z]+"# => ActionFn(4);)
-    //   r#"[a-z]+"# -> Reduce(Operation = r#"[a-z]+"# => ActionFn(4);)
+    //   EOF -> Reduce(Operation = r#"[a-z]+"# => ActionFn(5);)
+    //   ";" -> Reduce(Operation = r#"[a-z]+"# => ActionFn(5);)
+    //   r#"[0-9]+"# -> Reduce(Operation = r#"[a-z]+"# => ActionFn(5);)
+    //   r#"[a-z]+"# -> Reduce(Operation = r#"[a-z]+"# => ActionFn(5);)
     //
     pub fn __state5<
         'input,
@@ -372,10 +394,12 @@ mod __parse__Program {
             Some(Err(e)) => return Err(e),
         };
         match __lookahead {
+            None |
+            Some((_, (0, _), _)) |
             Some((_, (1, _), _)) |
             Some((_, (2, _), _)) => {
                 let __sym0 = __sym0.take().unwrap();
-                let __nt = super::__action4(input, __sym0, &__lookbehind, &__lookahead);
+                let __nt = super::__action5(input, __sym0, &__lookbehind, &__lookahead);
                 return Ok((__lookbehind, __lookahead, __Nonterminal::Operation(__nt)));
             }
             _ => {
@@ -392,7 +416,7 @@ mod __parse__Program {
     //   (<Instruction> ";")+ = (<Instruction> ";")+ Instruction (*) ";" [r#"[a-z]+"#]
     //   Program = (<Instruction> ";")+ Instruction (*) [EOF]
     //
-    //   EOF -> Reduce(Program = (<Instruction> ";")+, Instruction => ActionFn(22);)
+    //   EOF -> Reduce(Program = (<Instruction> ";")+, Instruction => ActionFn(23);)
     //   ";" -> Shift(S13)
     //
     pub fn __state6<
@@ -417,7 +441,7 @@ mod __parse__Program {
             None => {
                 let __sym0 = __sym0.take().unwrap();
                 let __sym1 = __sym1.take().unwrap();
-                let __nt = super::__action22(input, __sym0, __sym1, &__lookbehind, &__lookahead);
+                let __nt = super::__action23(input, __sym0, __sym1, &__lookbehind, &__lookahead);
                 return Ok((__lookbehind, __lookahead, __Nonterminal::Program(__nt)));
             }
             _ => {
@@ -434,8 +458,8 @@ mod __parse__Program {
     //   (<Instruction> ";")+ = Instruction ";" (*) [EOF]
     //   (<Instruction> ";")+ = Instruction ";" (*) [r#"[a-z]+"#]
     //
-    //   EOF -> Reduce((<Instruction> ";")+ = Instruction, ";" => ActionFn(16);)
-    //   r#"[a-z]+"# -> Reduce((<Instruction> ";")+ = Instruction, ";" => ActionFn(16);)
+    //   EOF -> Reduce((<Instruction> ";")+ = Instruction, ";" => ActionFn(17);)
+    //   r#"[a-z]+"# -> Reduce((<Instruction> ";")+ = Instruction, ";" => ActionFn(17);)
     //
     pub fn __state7<
         'input,
@@ -459,7 +483,7 @@ mod __parse__Program {
             Some((_, (2, _), _)) => {
                 let __sym0 = __sym0.take().unwrap();
                 let __sym1 = __sym1.take().unwrap();
-                let __nt = super::__action16(input, __sym0, __sym1, &__lookbehind, &__lookahead);
+                let __nt = super::__action17(input, __sym0, __sym1, &__lookbehind, &__lookahead);
                 return Ok((__lookbehind, __lookahead, __Nonterminal::_28_3cInstruction_3e_20_22_3b_22_29_2b(__nt)));
             }
             _ => {
@@ -477,10 +501,10 @@ mod __parse__Program {
     //   Place = Num (*) [r#"[0-9]+"#]
     //   Place = Num (*) [r#"[a-z]+"#]
     //
-    //   EOF -> Reduce(Place = Num => ActionFn(6);)
-    //   ";" -> Reduce(Place = Num => ActionFn(6);)
-    //   r#"[0-9]+"# -> Reduce(Place = Num => ActionFn(6);)
-    //   r#"[a-z]+"# -> Reduce(Place = Num => ActionFn(6);)
+    //   EOF -> Reduce(Place = Num => ActionFn(7);)
+    //   ";" -> Reduce(Place = Num => ActionFn(7);)
+    //   r#"[0-9]+"# -> Reduce(Place = Num => ActionFn(7);)
+    //   r#"[a-z]+"# -> Reduce(Place = Num => ActionFn(7);)
     //
     pub fn __state8<
         'input,
@@ -500,7 +524,7 @@ mod __parse__Program {
             Some((_, (1, _), _)) |
             Some((_, (2, _), _)) => {
                 let __sym0 = __sym0.take().unwrap();
-                let __nt = super::__action6(input, __sym0, &__lookbehind, &__lookahead);
+                let __nt = super::__action7(input, __sym0, &__lookbehind, &__lookahead);
                 return Ok((__lookbehind, __lookahead, __Nonterminal::Place(__nt)));
             }
             _ => {
@@ -601,10 +625,10 @@ mod __parse__Program {
     //   Place = Register (*) [r#"[0-9]+"#]
     //   Place = Register (*) [r#"[a-z]+"#]
     //
-    //   EOF -> Reduce(Place = Register => ActionFn(5);)
-    //   ";" -> Reduce(Place = Register => ActionFn(5);)
-    //   r#"[0-9]+"# -> Reduce(Place = Register => ActionFn(5);)
-    //   r#"[a-z]+"# -> Reduce(Place = Register => ActionFn(5);)
+    //   EOF -> Reduce(Place = Register => ActionFn(6);)
+    //   ";" -> Reduce(Place = Register => ActionFn(6);)
+    //   r#"[0-9]+"# -> Reduce(Place = Register => ActionFn(6);)
+    //   r#"[a-z]+"# -> Reduce(Place = Register => ActionFn(6);)
     //
     pub fn __state10<
         'input,
@@ -624,7 +648,7 @@ mod __parse__Program {
             Some((_, (1, _), _)) |
             Some((_, (2, _), _)) => {
                 let __sym0 = __sym0.take().unwrap();
-                let __nt = super::__action5(input, __sym0, &__lookbehind, &__lookahead);
+                let __nt = super::__action6(input, __sym0, &__lookbehind, &__lookahead);
                 return Ok((__lookbehind, __lookahead, __Nonterminal::Place(__nt)));
             }
             _ => {
@@ -642,10 +666,10 @@ mod __parse__Program {
     //   Num = r#"[0-9]+"# (*) [r#"[0-9]+"#]
     //   Num = r#"[0-9]+"# (*) [r#"[a-z]+"#]
     //
-    //   EOF -> Reduce(Num = r#"[0-9]+"# => ActionFn(8);)
-    //   ";" -> Reduce(Num = r#"[0-9]+"# => ActionFn(8);)
-    //   r#"[0-9]+"# -> Reduce(Num = r#"[0-9]+"# => ActionFn(8);)
-    //   r#"[a-z]+"# -> Reduce(Num = r#"[0-9]+"# => ActionFn(8);)
+    //   EOF -> Reduce(Num = r#"[0-9]+"# => ActionFn(9);)
+    //   ";" -> Reduce(Num = r#"[0-9]+"# => ActionFn(9);)
+    //   r#"[0-9]+"# -> Reduce(Num = r#"[0-9]+"# => ActionFn(9);)
+    //   r#"[a-z]+"# -> Reduce(Num = r#"[0-9]+"# => ActionFn(9);)
     //
     pub fn __state11<
         'input,
@@ -669,7 +693,7 @@ mod __parse__Program {
             Some((_, (1, _), _)) |
             Some((_, (2, _), _)) => {
                 let __sym0 = __sym0.take().unwrap();
-                let __nt = super::__action8(input, __sym0, &__lookbehind, &__lookahead);
+                let __nt = super::__action9(input, __sym0, &__lookbehind, &__lookahead);
                 return Ok((__lookbehind, __lookahead, __Nonterminal::Num(__nt)));
             }
             _ => {
@@ -687,10 +711,10 @@ mod __parse__Program {
     //   Register = r#"[a-z]+"# (*) [r#"[0-9]+"#]
     //   Register = r#"[a-z]+"# (*) [r#"[a-z]+"#]
     //
-    //   EOF -> Reduce(Register = r#"[a-z]+"# => ActionFn(7);)
-    //   ";" -> Reduce(Register = r#"[a-z]+"# => ActionFn(7);)
-    //   r#"[0-9]+"# -> Reduce(Register = r#"[a-z]+"# => ActionFn(7);)
-    //   r#"[a-z]+"# -> Reduce(Register = r#"[a-z]+"# => ActionFn(7);)
+    //   EOF -> Reduce(Register = r#"[a-z]+"# => ActionFn(8);)
+    //   ";" -> Reduce(Register = r#"[a-z]+"# => ActionFn(8);)
+    //   r#"[0-9]+"# -> Reduce(Register = r#"[a-z]+"# => ActionFn(8);)
+    //   r#"[a-z]+"# -> Reduce(Register = r#"[a-z]+"# => ActionFn(8);)
     //
     pub fn __state12<
         'input,
@@ -714,7 +738,7 @@ mod __parse__Program {
             Some((_, (1, _), _)) |
             Some((_, (2, _), _)) => {
                 let __sym0 = __sym0.take().unwrap();
-                let __nt = super::__action7(input, __sym0, &__lookbehind, &__lookahead);
+                let __nt = super::__action8(input, __sym0, &__lookbehind, &__lookahead);
                 return Ok((__lookbehind, __lookahead, __Nonterminal::Register(__nt)));
             }
             _ => {
@@ -730,8 +754,8 @@ mod __parse__Program {
     //   (<Instruction> ";")+ = (<Instruction> ";")+ Instruction ";" (*) [EOF]
     //   (<Instruction> ";")+ = (<Instruction> ";")+ Instruction ";" (*) [r#"[a-z]+"#]
     //
-    //   EOF -> Reduce((<Instruction> ";")+ = (<Instruction> ";")+, Instruction, ";" => ActionFn(17);)
-    //   r#"[a-z]+"# -> Reduce((<Instruction> ";")+ = (<Instruction> ";")+, Instruction, ";" => ActionFn(17);)
+    //   EOF -> Reduce((<Instruction> ";")+ = (<Instruction> ";")+, Instruction, ";" => ActionFn(18);)
+    //   r#"[a-z]+"# -> Reduce((<Instruction> ";")+ = (<Instruction> ";")+, Instruction, ";" => ActionFn(18);)
     //
     pub fn __state13<
         'input,
@@ -757,7 +781,7 @@ mod __parse__Program {
                 let __sym0 = __sym0.take().unwrap();
                 let __sym1 = __sym1.take().unwrap();
                 let __sym2 = __sym2.take().unwrap();
-                let __nt = super::__action17(input, __sym0, __sym1, __sym2, &__lookbehind, &__lookahead);
+                let __nt = super::__action18(input, __sym0, __sym1, __sym2, &__lookbehind, &__lookahead);
                 return Ok((__lookbehind, __lookahead, __Nonterminal::_28_3cInstruction_3e_20_22_3b_22_29_2b(__nt)));
             }
             _ => {
@@ -773,8 +797,8 @@ mod __parse__Program {
     //   Place = Num (*) [EOF]
     //   Place = Num (*) [";"]
     //
-    //   EOF -> Reduce(Place = Num => ActionFn(6);)
-    //   ";" -> Reduce(Place = Num => ActionFn(6);)
+    //   EOF -> Reduce(Place = Num => ActionFn(7);)
+    //   ";" -> Reduce(Place = Num => ActionFn(7);)
     //
     pub fn __state14<
         'input,
@@ -792,7 +816,7 @@ mod __parse__Program {
             None |
             Some((_, (0, _), _)) => {
                 let __sym0 = __sym0.take().unwrap();
-                let __nt = super::__action6(input, __sym0, &__lookbehind, &__lookahead);
+                let __nt = super::__action7(input, __sym0, &__lookbehind, &__lookahead);
                 return Ok((__lookbehind, __lookahead, __Nonterminal::Place(__nt)));
             }
             _ => {
@@ -847,8 +871,8 @@ mod __parse__Program {
     //   Place = Register (*) [EOF]
     //   Place = Register (*) [";"]
     //
-    //   EOF -> Reduce(Place = Register => ActionFn(5);)
-    //   ";" -> Reduce(Place = Register => ActionFn(5);)
+    //   EOF -> Reduce(Place = Register => ActionFn(6);)
+    //   ";" -> Reduce(Place = Register => ActionFn(6);)
     //
     pub fn __state16<
         'input,
@@ -866,7 +890,7 @@ mod __parse__Program {
             None |
             Some((_, (0, _), _)) => {
                 let __sym0 = __sym0.take().unwrap();
-                let __nt = super::__action5(input, __sym0, &__lookbehind, &__lookahead);
+                let __nt = super::__action6(input, __sym0, &__lookbehind, &__lookahead);
                 return Ok((__lookbehind, __lookahead, __Nonterminal::Place(__nt)));
             }
             _ => {
@@ -882,8 +906,8 @@ mod __parse__Program {
     //   Num = r#"[0-9]+"# (*) [EOF]
     //   Num = r#"[0-9]+"# (*) [";"]
     //
-    //   EOF -> Reduce(Num = r#"[0-9]+"# => ActionFn(8);)
-    //   ";" -> Reduce(Num = r#"[0-9]+"# => ActionFn(8);)
+    //   EOF -> Reduce(Num = r#"[0-9]+"# => ActionFn(9);)
+    //   ";" -> Reduce(Num = r#"[0-9]+"# => ActionFn(9);)
     //
     pub fn __state17<
         'input,
@@ -905,7 +929,7 @@ mod __parse__Program {
             None |
             Some((_, (0, _), _)) => {
                 let __sym0 = __sym0.take().unwrap();
-                let __nt = super::__action8(input, __sym0, &__lookbehind, &__lookahead);
+                let __nt = super::__action9(input, __sym0, &__lookbehind, &__lookahead);
                 return Ok((__lookbehind, __lookahead, __Nonterminal::Num(__nt)));
             }
             _ => {
@@ -921,8 +945,8 @@ mod __parse__Program {
     //   Register = r#"[a-z]+"# (*) [EOF]
     //   Register = r#"[a-z]+"# (*) [";"]
     //
-    //   EOF -> Reduce(Register = r#"[a-z]+"# => ActionFn(7);)
-    //   ";" -> Reduce(Register = r#"[a-z]+"# => ActionFn(7);)
+    //   EOF -> Reduce(Register = r#"[a-z]+"# => ActionFn(8);)
+    //   ";" -> Reduce(Register = r#"[a-z]+"# => ActionFn(8);)
     //
     pub fn __state18<
         'input,
@@ -944,7 +968,7 @@ mod __parse__Program {
             None |
             Some((_, (0, _), _)) => {
                 let __sym0 = __sym0.take().unwrap();
-                let __nt = super::__action7(input, __sym0, &__lookbehind, &__lookahead);
+                let __nt = super::__action8(input, __sym0, &__lookbehind, &__lookahead);
                 return Ok((__lookbehind, __lookahead, __Nonterminal::Register(__nt)));
             }
             _ => {
@@ -1488,12 +1512,28 @@ pub fn __action4<
     'input,
 >(
     input: &'input str,
+    op: Operation,
+    __lookbehind: &Option<usize>,
+    __lookahead: &Option<(usize, (usize, &'input str), usize)>,
+) -> Instruction
+{
+    match op {
+        Operation::Nop => Instruction::Nop,
+        _ => panic!("wrong number of arguments for opcode"),
+    }
+}
+
+pub fn __action5<
+    'input,
+>(
+    input: &'input str,
     __0: &'input str,
     __lookbehind: &Option<usize>,
     __lookahead: &Option<(usize, (usize, &'input str), usize)>,
 ) -> Operation
 {
     match __0 {
+    "nop" => Operation::Nop,
     "push" => Operation::Push,
     "pop" => Operation::Pop,
     "mov" => Operation::Mov,
@@ -1501,7 +1541,7 @@ pub fn __action4<
 }
 }
 
-pub fn __action5<
+pub fn __action6<
     'input,
 >(
     input: &'input str,
@@ -1513,7 +1553,7 @@ pub fn __action5<
     Place::Register(r)
 }
 
-pub fn __action6<
+pub fn __action7<
     'input,
 >(
     input: &'input str,
@@ -1525,7 +1565,7 @@ pub fn __action6<
     Place::Value(v)
 }
 
-pub fn __action7<
+pub fn __action8<
     'input,
 >(
     input: &'input str,
@@ -1545,7 +1585,7 @@ pub fn __action7<
 }
 }
 
-pub fn __action8<
+pub fn __action9<
     'input,
 >(
     input: &'input str,
@@ -1557,7 +1597,7 @@ pub fn __action8<
     u8::from_str(__0).unwrap()
 }
 
-pub fn __action9<
+pub fn __action10<
     'input,
 >(
     input: &'input str,
@@ -1569,7 +1609,7 @@ pub fn __action9<
     Some(__0)
 }
 
-pub fn __action10<
+pub fn __action11<
     'input,
 >(
     input: &'input str,
@@ -1580,7 +1620,7 @@ pub fn __action10<
     None
 }
 
-pub fn __action11<
+pub fn __action12<
     'input,
 >(
     input: &'input str,
@@ -1591,7 +1631,7 @@ pub fn __action11<
     vec![]
 }
 
-pub fn __action12<
+pub fn __action13<
     'input,
 >(
     input: &'input str,
@@ -1603,7 +1643,7 @@ pub fn __action12<
     v
 }
 
-pub fn __action13<
+pub fn __action14<
     'input,
 >(
     input: &'input str,
@@ -1616,7 +1656,7 @@ pub fn __action13<
     (__0)
 }
 
-pub fn __action14<
+pub fn __action15<
     'input,
 >(
     input: &'input str,
@@ -1628,7 +1668,7 @@ pub fn __action14<
     vec![__0]
 }
 
-pub fn __action15<
+pub fn __action16<
     'input,
 >(
     input: &'input str,
@@ -1641,7 +1681,7 @@ pub fn __action15<
     { let mut v = v; v.push(e); v }
 }
 
-pub fn __action16<
+pub fn __action17<
     'input,
 >(
     input: &'input str,
@@ -1651,42 +1691,15 @@ pub fn __action16<
     __lookahead: &Option<(usize, (usize, &'input str), usize)>,
 ) -> ::std::vec::Vec<Instruction>
 {
-    let __temp0 = __action13(
+    let __temp0 = __action14(
         input,
         __0,
         __1,
-        __lookbehind,
-        __lookahead,
-    );
-    __action14(
-        input,
-        __temp0,
-        __lookbehind,
-        __lookahead,
-    )
-}
-
-pub fn __action17<
-    'input,
->(
-    input: &'input str,
-    __0: ::std::vec::Vec<Instruction>,
-    __1: Instruction,
-    __2: &'input str,
-    __lookbehind: &Option<usize>,
-    __lookahead: &Option<(usize, (usize, &'input str), usize)>,
-) -> ::std::vec::Vec<Instruction>
-{
-    let __temp0 = __action13(
-        input,
-        __1,
-        __2,
         __lookbehind,
         __lookahead,
     );
     __action15(
         input,
-        __0,
         __temp0,
         __lookbehind,
         __lookahead,
@@ -1697,12 +1710,39 @@ pub fn __action18<
     'input,
 >(
     input: &'input str,
+    __0: ::std::vec::Vec<Instruction>,
+    __1: Instruction,
+    __2: &'input str,
+    __lookbehind: &Option<usize>,
+    __lookahead: &Option<(usize, (usize, &'input str), usize)>,
+) -> ::std::vec::Vec<Instruction>
+{
+    let __temp0 = __action14(
+        input,
+        __1,
+        __2,
+        __lookbehind,
+        __lookahead,
+    );
+    __action16(
+        input,
+        __0,
+        __temp0,
+        __lookbehind,
+        __lookahead,
+    )
+}
+
+pub fn __action19<
+    'input,
+>(
+    input: &'input str,
     __0: ::std::option::Option<Instruction>,
     __lookbehind: &Option<usize>,
     __lookahead: &Option<(usize, (usize, &'input str), usize)>,
 ) -> Vec<Instruction>
 {
-    let __temp0 = __action11(
+    let __temp0 = __action12(
         input,
         __lookbehind,
         __lookahead,
@@ -1716,7 +1756,7 @@ pub fn __action18<
     )
 }
 
-pub fn __action19<
+pub fn __action20<
     'input,
 >(
     input: &'input str,
@@ -1726,7 +1766,7 @@ pub fn __action19<
     __lookahead: &Option<(usize, (usize, &'input str), usize)>,
 ) -> Vec<Instruction>
 {
-    let __temp0 = __action12(
+    let __temp0 = __action13(
         input,
         __0,
         __lookbehind,
@@ -1741,7 +1781,7 @@ pub fn __action19<
     )
 }
 
-pub fn __action20<
+pub fn __action21<
     'input,
 >(
     input: &'input str,
@@ -1750,34 +1790,13 @@ pub fn __action20<
     __lookahead: &Option<(usize, (usize, &'input str), usize)>,
 ) -> Vec<Instruction>
 {
-    let __temp0 = __action9(
+    let __temp0 = __action10(
         input,
         __0,
         __lookbehind,
         __lookahead,
     );
-    __action18(
-        input,
-        __temp0,
-        __lookbehind,
-        __lookahead,
-    )
-}
-
-pub fn __action21<
-    'input,
->(
-    input: &'input str,
-    __lookbehind: &Option<usize>,
-    __lookahead: &Option<(usize, (usize, &'input str), usize)>,
-) -> Vec<Instruction>
-{
-    let __temp0 = __action10(
-        input,
-        __lookbehind,
-        __lookahead,
-    );
-    __action18(
+    __action19(
         input,
         __temp0,
         __lookbehind,
@@ -1789,21 +1808,17 @@ pub fn __action22<
     'input,
 >(
     input: &'input str,
-    __0: ::std::vec::Vec<Instruction>,
-    __1: Instruction,
     __lookbehind: &Option<usize>,
     __lookahead: &Option<(usize, (usize, &'input str), usize)>,
 ) -> Vec<Instruction>
 {
-    let __temp0 = __action9(
+    let __temp0 = __action11(
         input,
-        __1,
         __lookbehind,
         __lookahead,
     );
     __action19(
         input,
-        __0,
         __temp0,
         __lookbehind,
         __lookahead,
@@ -1815,16 +1830,41 @@ pub fn __action23<
 >(
     input: &'input str,
     __0: ::std::vec::Vec<Instruction>,
+    __1: Instruction,
     __lookbehind: &Option<usize>,
     __lookahead: &Option<(usize, (usize, &'input str), usize)>,
 ) -> Vec<Instruction>
 {
     let __temp0 = __action10(
         input,
+        __1,
         __lookbehind,
         __lookahead,
     );
-    __action19(
+    __action20(
+        input,
+        __0,
+        __temp0,
+        __lookbehind,
+        __lookahead,
+    )
+}
+
+pub fn __action24<
+    'input,
+>(
+    input: &'input str,
+    __0: ::std::vec::Vec<Instruction>,
+    __lookbehind: &Option<usize>,
+    __lookahead: &Option<(usize, (usize, &'input str), usize)>,
+) -> Vec<Instruction>
+{
+    let __temp0 = __action11(
+        input,
+        __lookbehind,
+        __lookahead,
+    );
+    __action20(
         input,
         __0,
         __temp0,

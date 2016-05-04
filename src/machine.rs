@@ -3,6 +3,7 @@ use ast::{Register, Operation, Instruction, Place};
 use opcode::*;
 use enum_primitive::FromPrimitive;
 use grammar;
+use linker;
 
 struct Ram {
     // The 6800 had 16bits of addressable ram
@@ -34,8 +35,7 @@ pub struct Machine {
     ram: Ram,
 }
 
-pub fn new(input: &str) -> Machine {
-    let program = grammar::parse_Program(input).unwrap();
+pub fn new() -> Machine {
     Machine{
         acca: 0,
         accb: 0,
@@ -48,10 +48,27 @@ pub fn new(input: &str) -> Machine {
 }
 
 impl Machine {
+    pub fn load(&mut self, input: &str) {
+        let program = grammar::parse_Program(input).unwrap();
+        let image = linker::assemble(&program);
+        let mut ix = 0;
+        for byte in image.iter() {
+            self.ram[ix] = *byte;
+            ix += 1;
+        }
+    }
+
     pub fn run(&mut self) {
         let opcode = self.ram[self.ix];
 
         match Opcode::from_i32(opcode as i32).unwrap() {
+            Opcode::NOP => { 
+                self.ix += 1;
+            },
+            Opcode::TAP => {
+            },
+            Opcode::TPA => {
+            },
             Opcode::PUL_A => {
                 self.acca = self.ram[self.sp];
                 self.sp += 1;
@@ -78,5 +95,3 @@ impl Machine {
         }
     }
 }
-
-

@@ -3,6 +3,7 @@ extern crate num;
 
 mod ast;
 mod grammar;
+mod linker;
 mod machine;
 mod opcode;
 
@@ -19,7 +20,8 @@ fn main() {
     let result = file.read_to_end(&mut contents).unwrap();
     let input = String::from_utf8(contents).unwrap();
 
-    let mut machine = machine::new(&input);
+    let mut machine = machine::new();
+    machine.load(&input);
     machine.run();
 }
 

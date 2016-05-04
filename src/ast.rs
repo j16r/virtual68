@@ -10,6 +10,7 @@ pub enum Register {
 
 #[derive(Debug)]
 pub enum Operation {
+    Nop,
     Push,
     Pop,
     Mov
@@ -23,6 +24,7 @@ pub enum Place {
 
 #[derive(Debug)]
 pub enum Instruction {
+    Nop,
     Push(Place),
     Pop(Place),
     Mov(Place, Place)
