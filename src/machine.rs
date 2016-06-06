@@ -32,6 +32,7 @@ pub struct Machine {
     sp: u16,
     cc: u8,
     ram: Ram,
+    stop_offset: u16,
 }
 
 pub fn new() -> Machine {
@@ -43,6 +44,7 @@ pub fn new() -> Machine {
         sp: 0,
         cc: 0,
         ram: Ram{bytes: [0; 65536]},
+        stop_offset: 0,
     }
 }
 
@@ -58,38 +60,44 @@ impl Machine {
     }
 
     pub fn run(&mut self) {
-        let opcode = self.ram[self.ix];
+        loop {
+            if self.ix >= self.stop_offset {
+                return
+            }
 
-        match Opcode::from_i32(opcode as i32).unwrap() {
-            Opcode::NOP => {
-                self.ix += 1;
-            },
-            Opcode::TAP => {
-            },
-            Opcode::TPA => {
-            },
-            Opcode::PUL_A => {
-                self.acca = self.ram[self.sp];
-                self.sp += 1;
-                self.ix += 1;
-            },
-            Opcode::PUL_B => {
-                self.accb = self.ram[self.sp];
-                self.sp += 1;
-                self.ix += 1;
-            },
-            Opcode::PSH_A => {
-                self.ram[self.sp] = self.acca;
-                self.sp += 1;
-                self.ix += 1;
-            },
-            Opcode::PSH_B => {
-                self.ram[self.sp] = self.accb;
-                self.sp += 1;
-                self.ix += 1;
-            },
-            _ => {
-                panic!("unhandled opcode");
+            let opcode = self.ram[self.ix];
+
+            match Opcode::from_i32(opcode as i32).unwrap() {
+                Opcode::NOP => {
+                    self.ix += 1;
+                },
+                Opcode::TAP => {
+                },
+                Opcode::TPA => {
+                },
+                Opcode::PUL_A => {
+                    self.acca = self.ram[self.sp];
+                    self.sp += 1;
+                    self.ix += 1;
+                },
+                Opcode::PUL_B => {
+                    self.accb = self.ram[self.sp];
+                    self.sp += 1;
+                    self.ix += 1;
+                },
+                Opcode::PSH_A => {
+                    self.ram[self.sp] = self.acca;
+                    self.sp += 1;
+                    self.ix += 1;
+                },
+                Opcode::PSH_B => {
+                    self.ram[self.sp] = self.accb;
+                    self.sp += 1;
+                    self.ix += 1;
+                },
+                _ => {
+                    panic!("unhandled opcode");
+                }
             }
         }
     }
@@ -97,10 +105,26 @@ impl Machine {
 
 #[cfg(test)]
 mod tests {
+    use opcode::Opcode;
+    use machine;
+
     #[test]
-    fn parse() {
-        assert!(parse_Program("push a").is_ok());
-        //assert!(parse_Program("push b").is_ok());
-        //assert!(parse_Program("mov acca 0").is_ok());
+    fn run_nop() {
+        let mut machine = machine::new();
+        machine.ram[0] = Opcode::NOP as u8;
+        machine.stop_offset = 1;
+        machine.run();
+        assert!(machine.ix == 1);
+        assert!(machine.sp == 0);
+    }
+
+    #[test]
+    fn run_push() {
+        let mut machine = machine::new();
+        machine.ram[0] = Opcode::PSH_A as u8;
+        machine.stop_offset = 1;
+        machine.run();
+        assert!(machine.ix == 1);
+        assert!(machine.sp == 1);
     }
 }
