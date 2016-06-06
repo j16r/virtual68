@@ -41,7 +41,7 @@ pub fn new() -> Machine {
         accb: 0,
         ix: 0,
         pc: 0,
-        sp: 0,
+        sp: 65535,
         cc: 0,
         ram: Ram{bytes: [0; 65536]},
         stop_offset: 0,
@@ -87,12 +87,12 @@ impl Machine {
                 },
                 Opcode::PSH_A => {
                     self.ram[self.sp] = self.acca;
-                    self.sp += 1;
+                    self.sp -= 1;
                     self.ix += 1;
                 },
                 Opcode::PSH_B => {
                     self.ram[self.sp] = self.accb;
-                    self.sp += 1;
+                    self.sp -= 1;
                     self.ix += 1;
                 },
                 _ => {
@@ -115,7 +115,7 @@ mod tests {
         machine.stop_offset = 1;
         machine.run();
         assert!(machine.ix == 1);
-        assert!(machine.sp == 0);
+        assert!(machine.sp == 65535);
     }
 
     #[test]
@@ -125,6 +125,17 @@ mod tests {
         machine.stop_offset = 1;
         machine.run();
         assert!(machine.ix == 1);
-        assert!(machine.sp == 1);
+        assert!(machine.sp == 65534);
+    }
+
+    #[test]
+    fn run_push_pop() {
+        let mut machine = machine::new();
+        machine.ram[0] = Opcode::PSH_A as u8;
+        machine.ram[1] = Opcode::PUL_A as u8;
+        machine.stop_offset = 2;
+        machine.run();
+        assert!(machine.ix == 2);
+        assert!(machine.sp == 65535);
     }
 }
