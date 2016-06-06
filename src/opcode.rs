@@ -2,7 +2,7 @@ use num::FromPrimitive;
 
 enum_from_primitive! {
 #[allow(non_camel_case_types)]
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub enum Opcode {
     UNASSIGNED_00,
     NOP,
@@ -244,7 +244,7 @@ pub enum Opcode {
     LDX_IND,
     STX_IND,
     SUB_B_EXT,
-    CMP_B_EX,
+    CMP_B_EXT,
     SBC_B_EXT,
     UNASSIGNED_F3,
     AND_B_EXT,

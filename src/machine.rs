@@ -1,5 +1,4 @@
 use std::ops::{Index, IndexMut};
-use ast::{Register, Operation, Instruction, Place};
 use opcode::*;
 use enum_primitive::FromPrimitive;
 use grammar;
@@ -62,7 +61,7 @@ impl Machine {
         let opcode = self.ram[self.ix];
 
         match Opcode::from_i32(opcode as i32).unwrap() {
-            Opcode::NOP => { 
+            Opcode::NOP => {
                 self.ix += 1;
             },
             Opcode::TAP => {
@@ -93,5 +92,15 @@ impl Machine {
                 panic!("unhandled opcode");
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn parse() {
+        assert!(parse_Program("push a").is_ok());
+        //assert!(parse_Program("push b").is_ok());
+        //assert!(parse_Program("mov acca 0").is_ok());
     }
 }

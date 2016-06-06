@@ -31,8 +31,8 @@ mod tests {
 
     #[test]
     fn parse() {
-        assert!(parse_Program("push 0").is_ok());
-        assert!(parse_Program("push sp").is_ok());
-        assert!(parse_Program("mov acca 0").is_ok());
+        assert!(parse_Program("push a").is_ok());
+        //assert!(parse_Program("push b").is_ok());
+        //assert!(parse_Program("mov acca 0").is_ok());
     }
 }
