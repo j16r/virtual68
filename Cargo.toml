@@ -2,12 +2,8 @@
 name = "virtual68"
 version = "0.1.0"
 authors = ["John Barker <jebarker@gmail.com>"]
-build = "build.rs"
-
-[build-dependencies]
-lalrpop = "0.9.0"
 
 [dependencies]
 enum_primitive = "*"
-lalrpop-util = "0.9.0"
 num = "*"
+pest = "0.4"

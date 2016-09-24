@@ -1,3 +1,5 @@
+#[macro_use]
+extern crate pest;
 #[macro_use] extern crate enum_primitive;
 extern crate num;
 
