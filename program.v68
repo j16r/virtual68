@@ -1,2 +1,3 @@
-push sp;
-mov acca 0
+psh a
+lda a 0
+inc a

@@ -1,5 +1,4 @@
 #[macro_use] extern crate enum_primitive;
-//extern crate num;
 extern crate combine;
 
 mod ast;
@@ -22,6 +21,8 @@ fn main() {
     let mut machine = machine::new();
     machine.load(&input);
     machine.run();
+
+    println!("machine state {}", machine);
 }
 
 #[cfg(test)]

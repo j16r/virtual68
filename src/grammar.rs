@@ -1,11 +1,15 @@
 use combine::{
     alpha_num,
+    char,
+    choice,
     letter,
     many1,
     newline,
+    optional,
     skip_many1,
-    sep_by,
+    sep_end_by,
     space,
+    tab,
     try,
     Parser,
     ParseError,
@@ -101,24 +105,34 @@ pub fn parse_program(input: &str) -> Result<Program, &str> {
             command
         });
 
-    let address = || many1(alpha_num())
-        .map(|token: String| {
+    let address = || (optional(choice([char(':'), char('@')])), many1(alpha_num()))
+        .map(|(prefix, token) : (Option<char>, String)| {
             match token.as_ref() {
                 "a" => Address::AccumulatorA,
                 "b" => Address::AccumulatorB,
-                _  if is_decimal(&token) => {
+                _ => {
                     let value = token.parse().unwrap();
-                    if value > 255 {
-                        Address::Extended(value)
-                    } else {
-                        Address::Direct((value & 0xff) as u8)
+                    match prefix {
+                        Some(':') => {
+                            if value > 255 {
+                                Address::Extended(value)
+                            } else {
+                                Address::Direct(value as u8)
+                            }
+                        },
+                        Some('@') => {
+                            Address::Indexed(value as u8)
+                        },
+                        Some(_) => unreachable!(),
+                        None => {
+                            Address::Immediate(value as u8)
+                        },
                     }
-                },
-                _ => panic!("unrecognized address '{}'", token)
+                }
             }
         });
 
-    let separator = || skip_many1(space());
+    let separator = || skip_many1(choice([char(' '), char('\t')]));
 
     let instruction_two_operands = (opcode(), separator(), address(), separator(), address())
         .map(|(opcode, _, left_address, _, right_address)| { 
@@ -135,7 +149,7 @@ pub fn parse_program(input: &str) -> Result<Program, &str> {
 
     let instruction = try(instruction_two_operands).or(try(instruction_one_operand).or(instruction_no_operand));
 
-    let mut program = sep_by(instruction, newline());
+    let mut program = sep_end_by(instruction, newline());
 
     let result : Result<(Vec<Instruction>, &str), ParseError<&str>> = program.parse(input);
     match result {
@@ -184,12 +198,21 @@ mod tests {
     }
 
     #[test]
-    fn test_sta_a_ind_input() {
+    fn test_sta_a_imm_input() {
         let input = "sta a 10";
         let program_result = parse_program(input);
         assert_eq!(
             program_result,
-            Ok(vec![Instruction::OperandTwo(Command::STA, Address::AccumulatorA, Address::Direct(10))]));
+            Ok(vec![Instruction::OperandTwo(Command::STA, Address::AccumulatorA, Address::Immediate(10))]));
+    }
+
+    #[test]
+    fn test_sta_a_ind_input() {
+        let input = "sta a @11";
+        let program_result = parse_program(input);
+        assert_eq!(
+            program_result,
+            Ok(vec![Instruction::OperandTwo(Command::STA, Address::AccumulatorA, Address::Indexed(11))]));
     }
 }
 
