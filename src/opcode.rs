@@ -66,7 +66,7 @@ enum_from_primitive! {
         UNASSIGNED_3D,
         WAI,
         SWI,
-        NEG,
+        NEG_A,
         UNASSIGNED_41,
         UNASSIGNED_42,
         COM_A,
