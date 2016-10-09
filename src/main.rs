@@ -1,5 +1,6 @@
 #[macro_use] extern crate enum_primitive;
-extern crate num;
+//extern crate num;
+extern crate combine;
 
 mod ast;
 mod grammar;
@@ -25,11 +26,11 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use grammar::parse_Program;
+    use grammar::parse_program;
 
     #[test]
     fn parse() {
-        assert!(parse_Program("push a").is_ok());
-        assert!(parse_Program("push b").is_ok());
+        assert!(parse_program("psh a").is_ok());
+        assert!(parse_program("sub a 1").is_ok());
     }
 }

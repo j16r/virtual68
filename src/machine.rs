@@ -50,7 +50,7 @@ pub fn new() -> Machine {
 
 impl Machine {
     pub fn load(&mut self, input: &str) {
-        let program = grammar::parse_Program(input).unwrap();
+        let program = grammar::parse_program(input).unwrap();
         let image = linker::assemble(&program);
         let mut ix = 0;
         for byte in image.iter() {
