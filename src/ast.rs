@@ -4,7 +4,6 @@ pub enum Command {
     ADC,
     ADD,
     AND,
-    AOC,
     ASL,
     ASR,
     BCC,
@@ -36,7 +35,6 @@ pub enum Command {
     DEC,
     DES,
     DEX,
-    DOR,
     EOR,
     INC,
     INS,
@@ -80,6 +78,7 @@ pub enum Command {
 pub enum Address {
     AccumulatorA,
     AccumulatorB,
+    Immediate(u8),
     Indexed(u8),
     Direct(u8),
     Extended(u16)

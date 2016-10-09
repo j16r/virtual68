@@ -34,22 +34,22 @@ enum_from_primitive! {
         UNASSIGNED_1D,
         UNASSIGNED_1E,
         UNASSIGNED_1F,
-        BRA_IND,
+        BRA_REL,
         UNASSIGNED_21,
-        BHI_IND,
-        BLS_IND,
-        BCC_IND,
-        BCS_IND,
-        BNE_IND,
-        BEQ_IND,
-        BVC_IND,
-        BVS_IND,
-        BPL_IND,
-        BMI_IND,
-        BGE_IND,
-        BLT_IND,
-        BGT_IND,
-        BLE_IND,
+        BHI_REL,
+        BLS_REL,
+        BCC_REL,
+        BCS_REL,
+        BNE_REL,
+        BEQ_REL,
+        BVC_REL,
+        BVS_REL,
+        BPL_REL,
+        BMI_REL,
+        BGE_REL,
+        BLT_REL,
+        BGT_REL,
+        BLE_REL,
         TSX,
         INS,
         PUL_A,
@@ -130,21 +130,22 @@ enum_from_primitive! {
         TST_EXT,
         JMP_EXT,
         CLR_EXT,
-        SUB_A,
-        CMP_A,
-        SBC_A,
-        UNASSIGNED_82,
-        AND_A,
-        BIT_A,
-        LDA_A,
+        SUB_A_IMM,
+        CMP_A_IMM,
+        SBC_A_IMM,
+        UNASSIGNED_83,
+        AND_A_IMM,
+        BIT_A_IMM,
+        LDA_A_IMM,
         UNASSIGNED_87,
-        EOR_A,
-        ADC_A,
-        ORA_A,
-        ADD_A,
-        CPX_A,
+        EOR_A_IMM,
+        ADC_A_IMM,
+        ORA_A_IMM,
+        ADD_A_IMM,
+        CPX_A_IMM,
         BSR_REL,
         LDS_IMM,
+        UNASSIGNED_8F,
         SUB_A_DIR,
         CMP_A_DIR,
         SBC_A_DIR,
@@ -153,7 +154,7 @@ enum_from_primitive! {
         BIT_A_DIR,
         LDA_A_DIR,
         STA_A_DIR,
-        DOR_A_DIR,
+        EOR_A_DIR,
         ADC_A_DIR,
         ORA_A_DIR,
         ADD_A_DIR,
@@ -169,7 +170,7 @@ enum_from_primitive! {
         BIT_A_IND,
         LDA_A_IND,
         STA_A_IND,
-        DOR_A_IND,
+        EOR_A_IND,
         ADC_A_IND,
         ORA_A_IND,
         ADD_A_IND,
@@ -234,7 +235,7 @@ enum_from_primitive! {
         LDA_B_IND,
         STA_B_IND,
         EOR_B_IND,
-        AOC_B_IND,
+        ADC_B_IND,
         ORA_B_IND,
         ADD_B_IND,
         UNASSIGNED_EC,
@@ -250,6 +251,7 @@ enum_from_primitive! {
         LDA_B_EXT,
         STA_B_EXT,
         ADC_B_EXT,
+        ADC_B_EXT_DUP,
         ORA_B_EXT,
         ADD_B_EXT,
         UNASSIGNED_FC,
@@ -257,4 +259,21 @@ enum_from_primitive! {
         LDX_EXT,
         STX_EXT,
     }
+}
+
+#[test]
+fn test_opcode_transcription() {
+    assert_eq!(Opcode::UNASSIGNED_00 as u8, 0x00);
+    assert_eq!(Opcode::NOP as u8, 0x01);
+    assert_eq!(Opcode::SWI as u8, 0x3F);
+
+    assert_eq!(Opcode::NEG_A as u8, 0x40);
+    assert_eq!(Opcode::CLR_EXT as u8, 0x7F);
+
+    assert_eq!(Opcode::SUB_A_IMM as u8, 0x80);
+    assert_eq!(Opcode::STS_EXT as u8, 0xbf);
+
+    assert_eq!(Opcode::SUB_B_IMM as u8, 0xc0);
+    assert_eq!(Opcode::UNASSIGNED_DD as u8, 0xdd);
+    assert_eq!(Opcode::STX_EXT as u8, 0xff);
 }
