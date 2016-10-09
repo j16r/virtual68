@@ -8,8 +8,6 @@ use combine::{
     optional,
     skip_many1,
     sep_end_by,
-    space,
-    tab,
     try,
     Parser,
     ParseError,

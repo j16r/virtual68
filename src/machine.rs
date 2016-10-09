@@ -47,7 +47,7 @@ pub struct Machine {
 impl fmt::Display for Machine {
     fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
         let output = format!(
-            "<Machine A:{} ({:#x}) B:{} ({:#x}) IX:{:#x} PC:{:#x} SP:{:#x} CC:{:#x}>",
+            "<Machine A:{} ({:#x}) B:{} ({:#x}) IX:{:#x} PC:{:#x} SP:{:#x} CC:{:0b}>",
             self.acca,
             self.acca,
             self.accb,
@@ -73,11 +73,13 @@ pub fn new() -> Machine {
     }
 }
 
-//impl<T: fmt::Debug> fmt::Debug for Machine {
-    //fn fmt(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        //self.data[..].fmt(formatter)
-    //}
-//}
+// Referred to in the manual as C V Z N I H condition codes
+const CARRY_BORROW_FLAG : u8 = 1 << 0;
+const OVERFLOW_FLAG : u8 = 1 << 1;
+const ZERO_FLAG : u8 = 1 << 2;
+const NEGATIVE_FLAG : u8 = 1 << 3;
+const INTERRUPT_MASK_FLAG : u8 = 1 << 4;
+const HALF_CARRY_FLAG: u8 = 1 << 4;
 
 impl Machine {
     pub fn load(&mut self, input: &str) {
@@ -88,7 +90,6 @@ impl Machine {
             self.ram[ix] = *byte;
             ix += 1;
         }
-        println!("stop_offset = {:?}", ix);
         self.stop_offset = ix;
     }
 
@@ -120,34 +121,47 @@ impl Machine {
                     panic!("unassigned opcode {:?}", opcode);
                 },
                 Opcode::TAP => {
-                    panic!("{:?} opcode not implemented yet", opcode);
+                    self.cc = self.cc & 0xc0 | self.acca & 0x3f;
+                    self.ix += 1;
                 },
                 Opcode::TPA => {
-                    panic!("{:?} opcode not implemented yet", opcode);
+                    self.acca = 0xc0 | self.cc & 0x3f;
+                    self.ix += 1;
                 },
                 Opcode::INX => {
-                    panic!("{:?} opcode not implemented yet", opcode);
+                    // TODO: Z: Set if all 16 bits of the result are cleared; cleared otherwise.
+                    // not sure what this means yet
+                    self.cc |= ZERO_FLAG;
+                    self.ix += 1;
                 },
                 Opcode::DEX => {
-                    panic!("{:?} opcode not implemented yet", opcode);
+                    // TODO: See above about Z
+                    self.cc |= ZERO_FLAG;
+                    self.ix -= 1;
                 },
                 Opcode::CLV => {
-                    panic!("{:?} opcode not implemented yet", opcode);
+                    self.cc &= !OVERFLOW_FLAG;
+                    self.ix += 1;
                 },
                 Opcode::SEV => {
-                    panic!("{:?} opcode not implemented yet", opcode);
+                    self.cc |= ZERO_FLAG;
+                    self.ix += 1;
                 },
                 Opcode::CLC => {
-                    panic!("{:?} opcode not implemented yet", opcode);
+                    self.cc &= !CARRY_BORROW_FLAG;
+                    self.ix += 1;
                 },
                 Opcode::SEC => {
-                    panic!("{:?} opcode not implemented yet", opcode);
+                    self.cc |= CARRY_BORROW_FLAG;
+                    self.ix += 1;
                 },
                 Opcode::CLI => {
-                    panic!("{:?} opcode not implemented yet", opcode);
+                    self.cc &= !INTERRUPT_MASK_FLAG;
+                    self.ix += 1;
                 },
                 Opcode::SEI => {
-                    panic!("{:?} opcode not implemented yet", opcode);
+                    self.cc |= INTERRUPT_MASK_FLAG;
+                    self.ix += 1;
                 },
                 Opcode::SBA => {
                     panic!("{:?} opcode not implemented yet", opcode);
@@ -168,10 +182,12 @@ impl Machine {
                     panic!("unassigned opcode {:?}", opcode);
                 },
                 Opcode::TAB => {
-                    panic!("{:?} opcode not implemented yet", opcode);
+                    self.accb = self.acca;
+                    self.ix += 1;
                 },
                 Opcode::TBA => {
-                    panic!("{:?} opcode not implemented yet", opcode);
+                    self.acca = self.accb;
+                    self.ix += 1;
                 },
                 Opcode::UNASSIGNED_18 => {
                     panic!("unassigned opcode {:?}", opcode);
@@ -183,8 +199,25 @@ impl Machine {
                     panic!("unassigned opcode {:?}", opcode);
                 },
                 Opcode::ABA => {
-                    panic!("{:?} opcode not implemented yet", opcode);
-                },
+                    let total : u16 = self.acca as u16 + self.accb as u16 ;
+                    // TODO: This is probably wrong
+                    if total & 1 << 3 {
+                        self.cc |= HALF_CARRY_FLAG;
+                    }
+                    if total > 0xff { // u8::MAX {
+                        self.cc |= CARRY_BORROW_FLAG;
+                    }
+                    // TODO: H V C need to be confirmed
+                    self.acca = total as u8;
+                    if self.acca & 0x80 > 0 {
+                        self.cc |= !NEGATIVE_FLAG;
+                    }
+                    if self.acca == 0 {
+                        self.cc |= ZERO_FLAG;
+                    } else {
+                        self.cc &= !ZERO_FLAG;
+                    }
+                }
                 Opcode::UNASSIGNED_1C => {
                     panic!("unassigned opcode {:?}", opcode);
                 },
