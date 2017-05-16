@@ -1,3 +1,5 @@
-psh a
-lda a 0
-inc a
+  psh a
+  lda a 0
+loop:
+  inc a
+  bra -1

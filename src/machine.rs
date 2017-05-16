@@ -101,6 +101,7 @@ impl Machine {
             }
 
             let opcode = Opcode::from_i32(self.ram[self.ix] as i32).unwrap();
+            println!("executing {:?}", opcode);
             match opcode {
                 Opcode::UNASSIGNED_00 => {
                     panic!("unassigned opcode {:?}", opcode);
@@ -201,7 +202,7 @@ impl Machine {
                 Opcode::ABA => {
                     let total : u16 = self.acca as u16 + self.accb as u16 ;
                     // TODO: This is probably wrong
-                    if total & 1 << 3 {
+                    if total & 1 << 3 > 0 {
                         self.cc |= HALF_CARRY_FLAG;
                     }
                     if total > 0xff { // u8::MAX {
@@ -231,7 +232,7 @@ impl Machine {
                     panic!("unassigned opcode {:?}", opcode);
                 },
                 Opcode::BRA_REL => {
-                    panic!("{:?} opcode not implemented yet", opcode);
+                    self.ix += 2 + self.ram[self.ix + 1] as u16;
                 },
                 Opcode::UNASSIGNED_21 => {
                     panic!("unassigned opcode {:?}", opcode);

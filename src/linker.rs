@@ -224,4 +224,15 @@ mod tests {
         assert_eq!(image[0], Opcode::SUB_B_DIR as u8);
         assert_eq!(image[1], 61 as u8);
     }
+
+    #[test]
+    fn test_bra_program_encodes_to_two_bytes() {
+        let mut program = Program::new();
+        program.push(Instruction::OperandOne(Command::BRA, Address::Indexed(13)));
+
+        let image = assemble(&program);
+        assert_eq!(image.len(), 2);
+        assert_eq!(image[0], Opcode::BRA_REL as u8);
+        assert_eq!(image[1], 13 as u8);
+    }
 }
