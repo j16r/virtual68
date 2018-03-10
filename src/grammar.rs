@@ -23,7 +23,7 @@ fn is_decimal(input: &str) -> bool {
 
 pub fn parse_program(input: &str) -> Result<Program, &str> {
     let opcode = || many1(letter())
-        .map(|token: String| { 
+        .map(|token: String| {
             let command = match token.as_ref() {
                 "aba" => Command::ABA,
                 "adc" => Command::ADC,
@@ -133,16 +133,16 @@ pub fn parse_program(input: &str) -> Result<Program, &str> {
     let separator = || skip_many1(choice([char(' '), char('\t')]));
 
     let instruction_two_operands = (opcode(), separator(), address(), separator(), address())
-        .map(|(opcode, _, left_address, _, right_address)| { 
-            Instruction::OperandTwo(opcode, left_address, right_address) 
+        .map(|(opcode, _, left_address, _, right_address)| {
+            Instruction::OperandTwo(opcode, left_address, right_address)
         });
     let instruction_one_operand = (opcode(), separator(), address())
-        .map(|(opcode, _, address)| { 
-            Instruction::OperandOne(opcode, address) 
+        .map(|(opcode, _, address)| {
+            Instruction::OperandOne(opcode, address)
         });
     let instruction_no_operand = (opcode())
-        .map(|opcode: Command| { 
-            Instruction::OperandNone(opcode) 
+        .map(|opcode: Command| {
+            Instruction::OperandNone(opcode)
         });
 
     let instruction = try(instruction_two_operands).or(try(instruction_one_operand).or(instruction_no_operand));

@@ -201,7 +201,7 @@ impl Machine {
                 Opcode::ABA => {
                     let total : u16 = self.acca as u16 + self.accb as u16 ;
                     // TODO: This is probably wrong
-                    if total & 1 << 3 {
+                    if (total & 1) << 3 == 0 {
                         self.cc |= HALF_CARRY_FLAG;
                     }
                     if total > 0xff { // u8::MAX {
