@@ -1,6 +1,6 @@
+use ast::{Address, Command, Instruction};
 use grammar::Program;
 use opcode::Opcode;
-use ast::{Instruction, Command, Address};
 
 fn opcode(command: &Command) -> Opcode {
     match *command {
@@ -79,10 +79,10 @@ fn opcode(command: &Command) -> Opcode {
     }
 }
 
-const OFFSET_OPCODE_B : u8 = 0x10;
-const OFFSET_OPCODE_IND : u8 = 0x20;
-const OFFSET_OPCODE_EXT : u8 = 0x30;
-const OFFSET_OPCODE_B_ADDR : u8 = 0x40;
+const OFFSET_OPCODE_B: u8 = 0x10;
+const OFFSET_OPCODE_IND: u8 = 0x20;
+const OFFSET_OPCODE_EXT: u8 = 0x30;
+const OFFSET_OPCODE_B_ADDR: u8 = 0x40;
 
 pub fn assemble(program: &Program) -> Vec<u8> {
     let mut image = Vec::<u8>::new();
@@ -96,22 +96,22 @@ pub fn assemble(program: &Program) -> Vec<u8> {
                 match *address {
                     Address::AccumulatorA => {
                         image.push(opcode as u8);
-                    },
+                    }
                     Address::AccumulatorB => {
                         image.push(opcode as u8 + OFFSET_OPCODE_B);
-                    },
+                    }
                     Address::Indexed(offset) => {
                         image.push(opcode as u8 + OFFSET_OPCODE_IND);
                         image.push(offset);
-                    },
+                    }
                     Address::Extended(offset) => {
                         image.push(opcode as u8 + OFFSET_OPCODE_EXT);
                         image.push(offset as u8);
                         image.push((offset >> 8) as u8);
                     }
-                    _ => panic!("unsupported address type for {:?} instruction", command)
+                    _ => panic!("unsupported address type for {:?} instruction", command),
                 }
-            },
+            }
             Instruction::OperandTwo(ref command, ref left_address, ref right_address) => {
                 let mut opcode = opcode(command);
 
@@ -128,17 +128,17 @@ pub fn assemble(program: &Program) -> Vec<u8> {
                     Address::Direct(offset) => {
                         image.push(opcode as u8 + base_offset + OFFSET_OPCODE_B);
                         image.push(offset);
-                    },
+                    }
                     Address::Indexed(offset) => {
                         image.push(opcode as u8 + base_offset + OFFSET_OPCODE_IND);
                         image.push(offset);
-                    },
+                    }
                     Address::Extended(offset) => {
                         image.push(opcode as u8 + base_offset + OFFSET_OPCODE_EXT);
                         image.push(offset as u8);
                         image.push((offset >> 8) as u8);
                     }
-                    _ => panic!("unsupported address type for {:?} instruction", command)
+                    _ => panic!("unsupported address type for {:?} instruction", command),
                 }
             }
         }
@@ -149,7 +149,7 @@ pub fn assemble(program: &Program) -> Vec<u8> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ast::{Instruction, Command, Address};
+    use ast::{Address, Command, Instruction};
     use grammar::Program;
     use opcode::Opcode;
 
@@ -194,7 +194,10 @@ mod tests {
     #[test]
     fn test_clr_ext_program_encodes_to_two_bytes() {
         let mut program = Program::new();
-        program.push(Instruction::OperandOne(Command::CLR, Address::Extended(12347)));
+        program.push(Instruction::OperandOne(
+            Command::CLR,
+            Address::Extended(12347),
+        ));
 
         let image = assemble(&program);
         assert_eq!(image.len(), 3);
@@ -206,7 +209,11 @@ mod tests {
     #[test]
     fn test_sub_a_imm_program_encodes_to_two_bytes() {
         let mut program = Program::new();
-        program.push(Instruction::OperandTwo(Command::SUB, Address::AccumulatorA, Address::Immediate(231)));
+        program.push(Instruction::OperandTwo(
+            Command::SUB,
+            Address::AccumulatorA,
+            Address::Immediate(231),
+        ));
 
         let image = assemble(&program);
         assert_eq!(image.len(), 2);
@@ -217,7 +224,11 @@ mod tests {
     #[test]
     fn test_sub_b_imm_program_encodes_to_two_bytes() {
         let mut program = Program::new();
-        program.push(Instruction::OperandTwo(Command::SUB, Address::AccumulatorB, Address::Direct(61)));
+        program.push(Instruction::OperandTwo(
+            Command::SUB,
+            Address::AccumulatorB,
+            Address::Direct(61),
+        ));
 
         let image = assemble(&program);
         assert_eq!(image.len(), 2);

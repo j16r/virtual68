@@ -81,7 +81,7 @@ pub enum Address {
     Immediate(u8),
     Indexed(u8),
     Direct(u8),
-    Extended(u16)
+    Extended(u16),
 }
 
 #[derive(Debug, PartialEq)]
@@ -90,4 +90,3 @@ pub enum Instruction {
     OperandOne(Command, Address),
     OperandTwo(Command, Address, Address),
 }
-

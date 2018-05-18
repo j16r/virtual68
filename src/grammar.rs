@@ -1,19 +1,7 @@
-use combine::{
-    alpha_num,
-    char,
-    choice,
-    letter,
-    many1,
-    newline,
-    optional,
-    skip_many1,
-    sep_end_by,
-    try,
-    Parser,
-    ParseError,
-    ParserExt};
+use combine::{alpha_num, char, choice, letter, newline, optional, sep_end_by, try, ParseError,
+              Parser, ParserExt, many1, skip_many1};
 
-use ast::{Command, Instruction, Address};
+use ast::{Address, Command, Instruction};
 
 pub type Program = Vec<Instruction>;
 
@@ -22,8 +10,8 @@ fn is_decimal(input: &str) -> bool {
 }
 
 pub fn parse_program(input: &str) -> Result<Program, &str> {
-    let opcode = || many1(letter())
-        .map(|token: String| {
+    let opcode = || {
+        many1(letter()).map(|token: String| {
             let command = match token.as_ref() {
                 "aba" => Command::ABA,
                 "adc" => Command::ADC,
@@ -98,14 +86,15 @@ pub fn parse_program(input: &str) -> Result<Program, &str> {
                 "txs" => Command::TXS,
                 "wai" => Command::WAI,
                 //_ => return Err(format!("unrecognized opcode '{}'", token))
-                _ => panic!("unrecognized opcode '{}'", token)
+                _ => panic!("unrecognized opcode '{}'", token),
             };
             command
-        });
+        })
+    };
 
-    let address = || (optional(choice([char(':'), char('@')])), many1(alpha_num()))
-        .map(|(prefix, token) : (Option<char>, String)| {
-            match token.as_ref() {
+    let address = || {
+        (optional(choice([char(':'), char('@')])), many1(alpha_num())).map(
+            |(prefix, token): (Option<char>, String)| match token.as_ref() {
                 "a" => Address::AccumulatorA,
                 "b" => Address::AccumulatorB,
                 _ => {
@@ -117,49 +106,43 @@ pub fn parse_program(input: &str) -> Result<Program, &str> {
                             } else {
                                 Address::Direct(value as u8)
                             }
-                        },
-                        Some('@') => {
-                            Address::Indexed(value as u8)
-                        },
+                        }
+                        Some('@') => Address::Indexed(value as u8),
                         Some(_) => unreachable!(),
-                        None => {
-                            Address::Immediate(value as u8)
-                        },
+                        None => Address::Immediate(value as u8),
                     }
                 }
-            }
-        });
+            },
+        )
+    };
 
     let separator = || skip_many1(choice([char(' '), char('\t')]));
 
-    let instruction_two_operands = (opcode(), separator(), address(), separator(), address())
-        .map(|(opcode, _, left_address, _, right_address)| {
+    let instruction_two_operands = (opcode(), separator(), address(), separator(), address()).map(
+        |(opcode, _, left_address, _, right_address)| {
             Instruction::OperandTwo(opcode, left_address, right_address)
-        });
+        },
+    );
     let instruction_one_operand = (opcode(), separator(), address())
-        .map(|(opcode, _, address)| {
-            Instruction::OperandOne(opcode, address)
-        });
-    let instruction_no_operand = (opcode())
-        .map(|opcode: Command| {
-            Instruction::OperandNone(opcode)
-        });
+        .map(|(opcode, _, address)| Instruction::OperandOne(opcode, address));
+    let instruction_no_operand = (opcode()).map(|opcode: Command| Instruction::OperandNone(opcode));
 
-    let instruction = try(instruction_two_operands).or(try(instruction_one_operand).or(instruction_no_operand));
+    let instruction =
+        try(instruction_two_operands).or(try(instruction_one_operand).or(instruction_no_operand));
 
     let mut program = sep_end_by(instruction, newline());
 
-    let result : Result<(Vec<Instruction>, &str), ParseError<&str>> = program.parse(input);
+    let result: Result<(Vec<Instruction>, &str), ParseError<&str>> = program.parse(input);
     match result {
         Ok((instructions, _remaining_input)) => Ok(instructions),
-        Err(error) => panic!("parser error {}", error)
+        Err(error) => panic!("parser error {}", error),
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ast::{Instruction, Command, Address};
+    use ast::{Address, Command, Instruction};
 
     #[test]
     fn test_empty_input() {
@@ -174,7 +157,8 @@ mod tests {
         let program_result = parse_program(input);
         assert_eq!(
             program_result,
-            Ok(vec![Instruction::OperandNone(Command::NOP)]));
+            Ok(vec![Instruction::OperandNone(Command::NOP)])
+        );
     }
 
     #[test]
@@ -183,7 +167,8 @@ mod tests {
         let program_result = parse_program(input);
         assert_eq!(
             program_result,
-            Ok(vec![Instruction::OperandNone(Command::NOP)]));
+            Ok(vec![Instruction::OperandNone(Command::NOP)])
+        );
     }
 
     #[test]
@@ -192,7 +177,10 @@ mod tests {
         let program_result = parse_program(input);
         assert_eq!(
             program_result,
-            Ok(vec![Instruction::OperandOne(Command::PSH, Address::AccumulatorA)]));
+            Ok(vec![
+                Instruction::OperandOne(Command::PSH, Address::AccumulatorA),
+            ])
+        );
     }
 
     #[test]
@@ -201,7 +189,14 @@ mod tests {
         let program_result = parse_program(input);
         assert_eq!(
             program_result,
-            Ok(vec![Instruction::OperandTwo(Command::STA, Address::AccumulatorA, Address::Immediate(10))]));
+            Ok(vec![
+                Instruction::OperandTwo(
+                    Command::STA,
+                    Address::AccumulatorA,
+                    Address::Immediate(10),
+                ),
+            ])
+        );
     }
 
     #[test]
@@ -210,8 +205,9 @@ mod tests {
         let program_result = parse_program(input);
         assert_eq!(
             program_result,
-            Ok(vec![Instruction::OperandTwo(Command::STA, Address::AccumulatorA, Address::Indexed(11))]));
+            Ok(vec![
+                Instruction::OperandTwo(Command::STA, Address::AccumulatorA, Address::Indexed(11)),
+            ])
+        );
     }
 }
-
-
